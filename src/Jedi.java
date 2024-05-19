@@ -53,4 +53,15 @@ public class Jedi {
     public void setStrength(double strength) {
         this.strength = strength;
     }
+
+    @Override
+    public String toString() {
+        return "Jedi{" +
+                "jediName='" + jediName + '\'' +
+                ", rank=" + rank +
+                ", age=" + age +
+                ", lightsaberColor='" + lightsaberColor + '\'' +
+                ", strength=" + strength +
+                '}';
+    }
 }

@@ -6,5 +6,5 @@ public enum Rank {
     KNIGHT,
     MASTER,
     BATTLE_MASTER,
-    GRAND_MASTER
+    GRAND_MASTER,
 }
