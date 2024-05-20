@@ -1,15 +1,17 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class FileOperations implements FileOperationsInterface{
     private String fileName;
     private String content;
-    private List<Planet> planets;
+    private Map<String, Planet> planets;
 
     public FileOperations(){
-        this.planets = new ArrayList<>();
+        this.planets = new HashMap<>();
     }
 
     public String getFileName() {
@@ -18,28 +20,47 @@ public class FileOperations implements FileOperationsInterface{
 
     public void open(Scanner scanner)
     {
-        System.out.print("Enter file name: ");
-        String fileName = scanner.nextLine().trim();
-        try {
-            File file = new File(fileName);
-            if (!file.exists()) {
+        System.out.print("Enter file name to open: ");
+        fileName = scanner.nextLine();
+
+        File file = new File(fileName);
+        if (!file.exists()) {
+            System.out.println("File does not exist. Creating a new file.");
+            try {
                 file.createNewFile();
-                content = "";
-                System.out.println("File created successfully.");
-            } else {
-                StringBuilder sb = new StringBuilder();
-                scanner = new Scanner(file);
-                while (scanner.hasNextLine()) {
-                    sb.append(scanner.nextLine()).append("\n");
-                }
-                scanner.close();
-                content = sb.toString();
+            } catch (IOException e) {
+                System.out.println("Error: Unable to create the file.");
             }
-            this.fileName = fileName;
-            System.out.println("Successfully opened " + fileName);
-        } catch (IOException e) {
-            System.out.println("Error: Could not open file.");
-            System.exit(1);
+        } else {
+            try {
+                List<String> lines = Files.readAllLines(Paths.get(fileName));
+                String currentPlanetName = null;
+                for (String line : lines) {
+                    if (line.startsWith("Planet: ")) {
+                        currentPlanetName = line.substring(8).trim();
+                        planets.put(currentPlanetName, new Planet(currentPlanetName));
+                    } else if (line.startsWith("Jedi: ")) {
+                        if (currentPlanetName == null) {
+                            System.out.println("Error: Jedi found without a planet.");
+                            continue;
+                        }
+                        String[] jediInfo = line.substring(6).split(", ");
+                        String jediName = jediInfo[0];
+                        String jediRank = jediInfo[1].split(": ")[1];
+                        int jediAge = Integer.parseInt(jediInfo[2].split(": ")[1]);
+                        String saberColor = jediInfo[3].split(": ")[1];
+                        int jediStrength = Integer.parseInt(jediInfo[4].split(": ")[1]);
+
+                        Jedi newJedi = new Jedi(jediName, Rank.valueOf(jediRank.toUpperCase()), jediAge, saberColor, jediStrength);
+                        planets.get(currentPlanetName).addJedi(newJedi);
+                    }else{
+                        System.out.println("Error");
+                    }
+                }
+                System.out.println("Successfully opened " + fileName);
+            } catch (IOException e) {
+                System.out.println("Error: Unable to read the file.");
+            }
         }
     }
 
@@ -54,15 +75,22 @@ public class FileOperations implements FileOperationsInterface{
     }
 
     public void save() {
-        if (fileName != null) {
-            try (FileWriter writer = new FileWriter(fileName)) {
-                writer.write(content);
-                System.out.println("Successfully saved " + fileName);
-            } catch (IOException e) {
-                System.out.println("Error: Could not save changes to file.");
-            }
-        } else {
+        if (fileName == null) {
             System.out.println("Error: No file is currently open.");
+            return;
+        }
+
+        try (FileWriter writer = new FileWriter(fileName)) {
+            for (Planet planet : planets.values()) {
+                writer.write("Planet: " + planet.getName() + "\n");
+                for (Jedi jedi : planet.getPopulation()) {
+                    writer.write(String.format("Jedi: %s, Rank: %s, Age: %d, SaberColor: %s, Strength: %.2f\n",
+                            jedi.getJediName(), jedi.getRank().toString(), jedi.getAge(), jedi.getLightsaberColor(), jedi.getStrength()));
+                }
+            }
+            System.out.println("Successfully saved " + fileName);
+        } catch (IOException e) {
+            System.out.println("Error: Unable to save the file.");
         }
     }
 
@@ -80,13 +108,13 @@ public class FileOperations implements FileOperationsInterface{
         System.out.println("open <file>       - opens <file>");
         System.out.println("close             - closes currently opened file");
         System.out.println("save              - saves the currently open file");
-        System.out.println("saveas <file>     - saves the currently open file in <file>");
+        System.out.println("save_as <file>     - saves the currently open file in <file>");
         System.out.println("help              - prints this information");
         System.out.println("exit              - exits the program");
-        System.out.println("addplanet <name>  - adds a new planet");
+        System.out.println("add_planet <name>  - adds a new planet");
         System.out.println("create_jedi <planet_name> <jedi_name> <rank> <age> <saber_color> <strength>");
         System.out.println("                  - creates a new jedi on a planet");
-        System.out.println("removejedi <jedi_name> <planet_name>");
+        System.out.println("remove_jedi <jedi_name> <planet_name>");
         System.out.println("                  - removes a jedi from a planet");
         System.out.println("promote_jedi <jedi_name> <multiplier>");
         System.out.println("                  - promotes a jedi");
@@ -102,160 +130,121 @@ public class FileOperations implements FileOperationsInterface{
 
     public void addPlanet(String planetName)
     {
-        planets.add(new Planet(planetName));
-        System.out.println("Successfully added planet: " + planetName);
+        if (!planets.containsKey(planetName)) {
+            planets.put(planetName, new Planet(planetName));
+            System.out.println("Successfully added planet " + planetName);
+        } else {
+            System.out.println("Error: Planet already exists.");
+        }
     }
 
-    public void createJedi(String planetName, String jediName, String jediRank, int jediAge, String saberColor, double jediStrength) {
-        for (Planet planet : planets) {
-            for (Jedi jedi : planet.getPopulation()) {
-                if (jedi.getJediName().equalsIgnoreCase(jediName)) {
-                    System.out.println("Error: A Jedi with the name " + jediName + " already exists on planet " + planet.getName());
-                    return;
-                }
-            }
+    public void createJedi(String planetName, String jediName, String jediRank, int jediAge, String saberColor, int jediStrength) {
+        Planet planet = planets.get(planetName);
+        if (planet == null) {
+            System.out.println("Error: Planet " + planetName + " does not exist.");
+            return;
         }
 
-        for (Planet planet : planets) {
-            if (planet.getName().equalsIgnoreCase(planetName)) {
-                Rank rank;
-                try {
-                    rank = Rank.valueOf(jediRank.toUpperCase());
-                } catch (IllegalArgumentException e) {
-                    System.out.println("Error: Invalid Jedi rank.");
-                    return;
-                }
-
-                Jedi newJedi = new Jedi(jediName, rank, jediAge, saberColor, jediStrength);
-                planet.addJedi(newJedi);
-                System.out.println("Successfully added Jedi " + jediName + " to planet " + planetName);
+        for (Jedi jedi : planet.getPopulation()) {
+            if (jedi.getJediName().equalsIgnoreCase(jediName)) {
+                System.out.println("Error: Jedi " + jediName + " already exists.");
                 return;
             }
         }
 
-        System.out.println("Error: No planet with the name " + planetName + " found.");
+        Jedi newJedi = new Jedi(jediName, Rank.valueOf(jediRank.toUpperCase()), jediAge, saberColor, jediStrength);
+        planet.addJedi(newJedi);
+        System.out.println("Successfully added Jedi " + jediName + " to planet " + planetName);
+
     }
 
     public void removeJedi(String jediName, String planetName) {
-        for (Planet planet : planets) {
-            if (planet.getName().equalsIgnoreCase(planetName)) {
-                boolean removed = planet.removeJedi(jediName);
-                if (removed) {
-                    System.out.println("Successfully removed Jedi " + jediName + " from planet " + planetName);
-                } else {
-                    System.out.println("Error: Jedi " + jediName + " does not inhabit planet " + planetName);
-                }
-                return;
-            }
+        Planet planet = planets.get(planetName);
+        if (planet == null) {
+            System.out.println("Error: Planet " + planetName + " does not exist.");
+            return;
         }
-        System.out.println("Error: Planet " + planetName + " not found.");
+
+        if (planet.removeJedi(jediName)) {
+            System.out.println("Successfully removed Jedi " + jediName + " from planet " + planetName);
+        } else {
+            System.out.println("Error: Jedi " + jediName + " does not exist on planet " + planetName);
+        }
     }
 
     public void promoteJedi(String jediName, double multiplier) {
-        for (Planet planet : planets) {
+        for (Planet planet : planets.values()) {
             for (Jedi jedi : planet.getPopulation()) {
                 if (jedi.getJediName().equalsIgnoreCase(jediName)) {
-                    Rank currentRank = jedi.getRank();
-                    int currentRankIndex = currentRank.ordinal();
-                    int nextRankIndex = Math.min(currentRankIndex + 1, Rank.values().length - 1);
-                    Rank nextRank = Rank.values()[nextRankIndex];
-
-                    double currentStrength = jedi.getStrength();
-                    double newStrength = currentStrength + (multiplier * currentStrength);
-
-                    jedi.setRank(nextRank);
-                    jedi.setStrength(newStrength);
-
-                    System.out.println("Successfully promoted Jedi " + jediName + " to " + nextRank + " and increased strength to " + newStrength);
+                    if (jedi.promote()) {
+                        System.out.println("Successfully promoted Jedi " + jediName);
+                    } else {
+                        System.out.println("Error: Jedi " + jediName + " is already at the highest rank.");
+                    }
                     return;
                 }
             }
         }
-        System.out.println("Error: Jedi " + jediName + " not found.");
+        System.out.println("Error: Jedi " + jediName + " does not exist.");
     }
 
     public void demoteJedi(String jediName, double multiplier) {
-        for (Planet planet : planets) {
+        for (Planet planet : planets.values()) {
             for (Jedi jedi : planet.getPopulation()) {
                 if (jedi.getJediName().equalsIgnoreCase(jediName)) {
-                    Rank currentRank = jedi.getRank();
-                    int currentRankIndex = currentRank.ordinal();
-                    int nextRankIndex = Math.max(currentRankIndex - 1, 0);
-                    Rank nextRank = Rank.values()[nextRankIndex];
-
-                    double currentStrength = jedi.getStrength();
-                    double newStrength = currentStrength - (multiplier * currentStrength);
-
-                    jedi.setRank(nextRank);
-                    jedi.setStrength(newStrength);
-
-                    System.out.println("Successfully demoted Jedi " + jediName + " to " + nextRank + " and decreased strength to " + newStrength);
+                    if (jedi.demote()) {
+                        System.out.println("Successfully demoted Jedi " + jediName);
+                    } else {
+                        System.out.println("Error: Jedi " + jediName + " is already at the lowest rank.");
+                    }
                     return;
                 }
             }
         }
-        System.out.println("Error: Jedi " + jediName + " not found.");
+        System.out.println("Error: Jedi " + jediName + " does not exist.");
     }
 
     public void getStrongestJedi(String planetName) {
-        Jedi strongestJedi = null;
-        double maxStrength = Double.MIN_VALUE;
-
-        for (Planet planet : planets) {
-            if (planet.getName().equalsIgnoreCase(planetName)) {
-                for (Jedi jedi : planet.getPopulation()) {
-                    if (jedi.getStrength() > maxStrength) {
-                        maxStrength = jedi.getStrength();
-                        strongestJedi = jedi;
-                    }
-                }
-                break;
-            }
+        Planet planet = planets.get(planetName);
+        if (planet == null) {
+            System.out.println("Error: Planet " + planetName + " does not exist.");
+            return;
         }
 
+        Jedi strongestJedi = planet.getPopulation().stream()
+                .max(Comparator.comparingDouble(Jedi::getStrength))
+                .orElse(null);
+
         if (strongestJedi != null) {
-            System.out.println("Strongest Jedi on planet " + planetName + ":");
-            System.out.println("Name: " + strongestJedi.getJediName());
-            System.out.println("Rank: " + strongestJedi.getRank());
-            System.out.println("Age: " + strongestJedi.getAge());
-            System.out.println("Saber Color: " + strongestJedi.getLightsaberColor());
-            System.out.println("Strength: " + strongestJedi.getStrength());
+            System.out.println("The strongest Jedi on " + planetName + " is " + strongestJedi.getJediName() + ", Strength: " + strongestJedi.getStrength());
         } else {
-            System.out.println("Error: Planet " + planetName + " not found or no jedis inhabit it.");
+            System.out.println("Error: No Jedi found on planet " + planetName);
         }
     }
 
-    public void getYoungestJedi(String planetName, Rank rank) {
-        Jedi youngestJedi = null;
-        int minAge = Integer.MAX_VALUE;
-
-        for (Planet planet : planets) {
-            if (planet.getName().equalsIgnoreCase(planetName)) {
-                for (Jedi jedi : planet.getPopulation()) {
-                    if (jedi.getRank() == rank && jedi.getAge() < minAge) {
-                        minAge = jedi.getAge();
-                        youngestJedi = jedi;
-                    }
-                }
-                break;
-            }
+    public void getYoungestJedi(String planetName, String jediRank) {
+        Planet planet = planets.get(planetName);
+        if (planet == null) {
+            System.out.println("Error: Planet " + planetName + " does not exist.");
+            return;
         }
 
+        Jedi youngestJedi = planet.getPopulation().stream()
+                .filter(jedi -> jedi.getRank().toString().equalsIgnoreCase(jediRank))
+                .min(Comparator.comparingInt(Jedi::getAge))
+                .orElse(null);
+
         if (youngestJedi != null) {
-            System.out.println("Youngest Jedi with rank " + rank + " on planet " + planetName + ":");
-            System.out.println("Name: " + youngestJedi.getJediName());
-            System.out.println("Age: " + youngestJedi.getAge());
-            System.out.println("Saber Color: " + youngestJedi.getLightsaberColor());
-            System.out.println("Strength: " + youngestJedi.getStrength());
+            System.out.println("The youngest " + jediRank + " on " + planetName + " is " + youngestJedi.getJediName() + ", Age: " + youngestJedi.getAge());
         } else {
-            System.out.println("Error: No Jedi with rank " + rank + " found on planet " + planetName + ".");
+            System.out.println("Error: No Jedi of rank " + jediRank + " found on planet " + planetName);
         }
     }
 
     public void getMostUsedSaberColor(String planetName, Rank rank) {
         Map<String, Integer> colorCount = new HashMap<>();
 
-        for (Planet planet : planets) {
+        for (Planet planet : planets.values()) {
             if (planet.getName().equalsIgnoreCase(planetName)) {
                 for (Jedi jedi : planet.getPopulation()) {
                     if (jedi.getRank() == rank) {
@@ -288,7 +277,7 @@ public class FileOperations implements FileOperationsInterface{
         Map<String, Integer> colorCount = new HashMap<>();
         boolean grandMasterExists = false;
 
-        for (Planet planet : planets) {
+        for (Planet planet : planets.values()) {
             if (planet.getName().equalsIgnoreCase(planetName)) {
                 for (Jedi jedi : planet.getPopulation()) {
                     if (jedi.getRank() == Rank.GRAND_MASTER) {
@@ -323,87 +312,50 @@ public class FileOperations implements FileOperationsInterface{
     }
 
     public void printPlanet(String planetName) {
-        for (Planet planet : planets) {
-            if (planet.getName().equalsIgnoreCase(planetName)) {
-                System.out.println("Planet: " + planet.getName());
-                System.out.println("Jedis:");
-
-                Collections.sort(planet.getPopulation(), Comparator.comparing(Jedi::getRank).thenComparing(Jedi::getJediName));
-
-                for (Jedi jedi : planet.getPopulation()) {
-                    System.out.println("  Name: " + jedi.getJediName());
-                    System.out.println("  Rank: " + jedi.getRank());
-                    System.out.println("  Age: " + jedi.getAge());
-                    System.out.println("  Saber Color: " + jedi.getLightsaberColor());
-                    System.out.println("  Strength: " + jedi.getStrength());
-                    System.out.println();
-                }
-                return;
-            }
+        Planet planet = planets.get(planetName);
+        if (planet == null) {
+            System.out.println("Error: Planet " + planetName + " does not exist.");
+            return;
         }
-        System.out.println("Error: Planet " + planetName + " not found.");
+
+        System.out.println("Planet: " + planet.getName());
+        List<Jedi> jediList = planet.getPopulation();
+        jediList.sort(Comparator.comparing(Jedi::getRank).thenComparing(Jedi::getJediName));
+        for (Jedi jedi : jediList) {
+            System.out.println(jedi);
+        }
     }
 
     public void printJedi(String jediName) {
-        for (Planet planet : planets) {
+        for (Planet planet : planets.values()) {
             for (Jedi jedi : planet.getPopulation()) {
                 if (jedi.getJediName().equalsIgnoreCase(jediName)) {
-                    System.out.println("Jedi Name: " + jedi.getJediName());
+                    System.out.println("Jedi: " + jedi);
                     System.out.println("Planet: " + planet.getName());
-                    System.out.println("Rank: " + jedi.getRank());
-                    System.out.println("Age: " + jedi.getAge());
-                    System.out.println("Saber Color: " + jedi.getLightsaberColor());
-                    System.out.println("Strength: " + jedi.getStrength());
                     return;
                 }
             }
         }
-        System.out.println("Error: Jedi " + jediName + " not found.");
+        System.out.println("Error: Jedi " + jediName + " does not exist.");
     }
 
-    public void printTwoPlanets(String planet1Name, String planet2Name) {
-        List<Jedi> allJedis = new ArrayList<>();
+    public void printTwoPlanets(String planetName1, String planetName2) {
 
-        for (Planet planet : planets) {
-            if (planet.getName().equalsIgnoreCase(planet1Name)) {
-                allJedis.addAll(planet.getPopulation());
-                break;
-            }
+        Planet planet1 = planets.get(planetName1);
+        Planet planet2 = planets.get(planetName2);
+        if (planet1 == null || planet2 == null) {
+            System.out.println("Error: One or both planets do not exist.");
+            return;
         }
 
-        for (Planet planet : planets) {
-            if (planet.getName().equalsIgnoreCase(planet2Name)) {
-                allJedis.addAll(planet.getPopulation());
-                break;
-            }
-        }
+        List<Jedi> combinedJediList = new ArrayList<>();
+        combinedJediList.addAll(planet1.getPopulation());
+        combinedJediList.addAll(planet2.getPopulation());
 
-        Collections.sort(allJedis, Comparator.comparing(Jedi::getRank).thenComparing(jedi -> {
-            for (Planet planet : planets) {
-                if (planet.getPopulation().contains(jedi)) {
-                    return planet.getName();
-                }
-            }
-            return "";
-        }));
+        combinedJediList.sort(Comparator.comparing(Jedi::getJediName));
 
-        for (Jedi jedi : allJedis) {
-            System.out.println("Jedi Name: " + jedi.getJediName());
-            System.out.println("Planet: " + getJediPlanet(jedi));
-            System.out.println("Rank: " + jedi.getRank());
-            System.out.println("Age: " + jedi.getAge());
-            System.out.println("Saber Color: " + jedi.getLightsaberColor());
-            System.out.println("Strength: " + jedi.getStrength());
-            System.out.println();
+        for (Jedi jedi : combinedJediList) {
+            System.out.println(jedi);
         }
-    }
-
-    private String getJediPlanet(Jedi jedi) {
-        for (Planet planet : planets) {
-            if (planet.getPopulation().contains(jedi)) {
-                return planet.getName();
-            }
-        }
-        return "Unknown";
     }
 }

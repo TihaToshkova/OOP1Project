@@ -3,9 +3,9 @@ public class Jedi {
     private Rank rank;
     private int age;
     private String lightsaberColor;
-    private double strength;
+    private int strength;
 
-    public Jedi(String jediName, Rank rank, int age, String lightsaberColor, double strength)
+    public Jedi(String jediName, Rank rank, int age, String lightsaberColor, int strength)
     {
         this.jediName = jediName;
         this.rank = rank;
@@ -46,12 +46,31 @@ public class Jedi {
         this.lightsaberColor = lightsaberColor;
     }
 
-    public double getStrength() {
+    public int getStrength() {
         return strength;
     }
 
-    public void setStrength(double strength) {
+    public void setStrength(int strength) {
         this.strength = strength;
+    }
+
+    public boolean promote() {
+        Rank[] ranks = Rank.values();
+        int currentIndex = this.rank.ordinal();
+        if (currentIndex < ranks.length - 1) {
+            this.rank = ranks[currentIndex + 1];
+            return true;
+        }
+        return false;
+    }
+
+    public boolean demote() {
+        int currentIndex = this.rank.ordinal();
+        if (currentIndex > 0) {
+            this.rank = Rank.values()[currentIndex - 1];
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -60,7 +79,7 @@ public class Jedi {
                 "jediName='" + jediName + '\'' +
                 ", rank=" + rank +
                 ", age=" + age +
-                ", lightsaberColor='" + lightsaberColor + '\'' +
+                ", light saber color='" + lightsaberColor + '\'' +
                 ", strength=" + strength +
                 '}';
     }

@@ -33,15 +33,7 @@ public class Planet {
     }
 
     public boolean removeJedi(String jediName) {
-        Iterator<Jedi> iterator = population.iterator();
-        while (iterator.hasNext()) {
-            Jedi jedi = iterator.next();
-            if (jedi.getJediName().equalsIgnoreCase(jediName)) {
-                iterator.remove();
-                return true;
-            }
-        }
-        return false;
+        return population.removeIf(jedi -> jedi.getJediName().equalsIgnoreCase(jediName));
     }
 
     @Override
