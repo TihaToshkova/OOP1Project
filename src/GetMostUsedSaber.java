@@ -21,7 +21,7 @@ public class GetMostUsedSaber implements GetMostUsedSaberInterface{
         Map<String, Integer> colorCount = new HashMap<>();
         for (Jedi jedi : jedis) {
             if(jedi.getRank().equals(rank)){
-                String color = jedi.getLightsaberColor();
+                String color = jedi.getLightSaberColor();
                 colorCount.put(color, colorCount.getOrDefault(color, 0) + 1);
             }
         }
@@ -63,7 +63,7 @@ public class GetMostUsedSaber implements GetMostUsedSaberInterface{
         for (Jedi jedi : jedis) {
             if (jedi.getRank().equals(Rank.GRAND_MASTER.name())) {
                 hasGrandMaster = true;
-                String color = jedi.getLightsaberColor();
+                String color = jedi.getLightSaberColor();
                 colorCount.put(color, colorCount.getOrDefault(color, 0) + 1);
             }
         }

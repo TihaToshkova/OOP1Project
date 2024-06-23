@@ -2,15 +2,15 @@ public class Jedi {
     private String jediName;
     private Rank rank;
     private int age;
-    private String lightsaberColor;
+    private String lightSaberColor;
     private int strength;
 
-    public Jedi(String jediName, Rank rank, int age, String lightsaberColor, int strength)
+    public Jedi(String jediName, Rank rank, int age, String lightSaberColor, int strength)
     {
         this.jediName = jediName;
         this.rank = rank;
         this.age = age;
-        this.lightsaberColor = lightsaberColor;
+        this.lightSaberColor = lightSaberColor;
         this.strength = strength;
     }
 
@@ -26,33 +26,23 @@ public class Jedi {
         return rank;
     }
 
-    public void setRank(Rank rank) {
-        this.rank = rank;
-    }
+    public void setRank(Rank rank) {this.rank = rank;}
 
     public int getAge() {
         return age;
     }
 
-    public void setAge(int age) {
-        this.age = age;
-    }
+    public void setAge(int age) {this.age = age;}
 
-    public String getLightsaberColor() {
-        return lightsaberColor;
-    }
+    public String getLightSaberColor() {return lightSaberColor;}
 
-    public void setLightsaberColor(String lightsaberColor) {
-        this.lightsaberColor = lightsaberColor;
-    }
+    public void setLightSaberColor(String lightSaberColor) {this.lightSaberColor = lightSaberColor;}
 
     public int getStrength() {
         return strength;
     }
 
-    public void setStrength(int strength) {
-        this.strength = strength;
-    }
+    public void setStrength(int strength) {this.strength = strength;}
 
     public boolean promote() {
         Rank[] ranks = Rank.values();
@@ -79,7 +69,7 @@ public class Jedi {
                 "jediName='" + jediName + '\'' +
                 ", rank=" + rank +
                 ", age=" + age +
-                ", light saber color='" + lightsaberColor + '\'' +
+                ", light saber color='" + lightSaberColor + '\'' +
                 ", strength=" + strength +
                 '}';
     }

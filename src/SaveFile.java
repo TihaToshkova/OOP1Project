@@ -15,7 +15,7 @@ public class SaveFile implements SaveFileInterface{
                 writer.write("Planet " + planet.getName() + "\n");
                 for (Jedi jedi : planet.getPopulation()) {
                     writer.write("Jedi " + jedi.getJediName() + " " + jedi.getRank() + " " +
-                            jedi.getAge() + " " + jedi.getLightsaberColor() + " " + jedi.getStrength() + " " +
+                            jedi.getAge() + " " + jedi.getLightSaberColor() + " " + jedi.getStrength() + " " +
                             planet.getName() + "\n");
                 }
             }
