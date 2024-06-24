@@ -1,5 +1,3 @@
-import java.util.Map;
-
 public class CloseFile implements CloseFileInterface{
     public void close(FileOperations fileOperations) {
         if (fileOperations.getFileName() == null) {

@@ -1,6 +1,3 @@
-import java.util.HashMap;
-import java.util.Map;
-
 public class RemoveJedi implements RemoveJediInterface{
     public void removeJedi(FileOperations fileOperations,String jediName, String planetName) {
         if (!fileOperations.getPlanets().containsKey(planetName)) {

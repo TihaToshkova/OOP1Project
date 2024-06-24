@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class Planet {
@@ -12,20 +11,9 @@ public class Planet {
         this.population = new ArrayList<>();
     }
 
-    public String getName()
-    {
-        return name;
-    }
+    public String getName() {return name;}
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public List<Jedi> getPopulation()
-    {
-        return population;
-    }
+    public List<Jedi> getPopulation() {return population;}
 
     public  void addJedi(Jedi jedi)
     {

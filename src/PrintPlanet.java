@@ -1,7 +1,4 @@
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class PrintPlanet implements PrintInterface{
     public void print(FileOperations fileOperations, String planetName) {
@@ -16,5 +13,4 @@ public class PrintPlanet implements PrintInterface{
             System.out.println("Planet not found: " + planetName);
         }
     }
-
 }

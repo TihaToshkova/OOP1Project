@@ -1,6 +1,3 @@
-import java.util.HashMap;
-import java.util.Map;
-
 public class DemoteJedi implements DemoteJediInterface{
     public void demoteJedi(FileOperations fileOperations,String jediName, double multiplier) {
         if (multiplier <= 0) {

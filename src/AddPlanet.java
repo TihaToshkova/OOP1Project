@@ -1,6 +1,3 @@
-import java.util.HashMap;
-import java.util.Map;
-
 public class AddPlanet implements AddPlanetInterface{
     public void addPlanet(FileOperations fileOperations, String planetName) {
         if (!fileOperations.getPlanets().containsKey(planetName)) {

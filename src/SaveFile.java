@@ -1,7 +1,5 @@
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class SaveFile implements SaveFileInterface{
     public void save(FileOperations fileOperations) {

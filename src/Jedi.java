@@ -26,23 +26,15 @@ public class Jedi {
         return rank;
     }
 
-    public void setRank(Rank rank) {this.rank = rank;}
-
     public int getAge() {
         return age;
     }
 
-    public void setAge(int age) {this.age = age;}
-
     public String getLightSaberColor() {return lightSaberColor;}
-
-    public void setLightSaberColor(String lightSaberColor) {this.lightSaberColor = lightSaberColor;}
 
     public int getStrength() {
         return strength;
     }
-
-    public void setStrength(int strength) {this.strength = strength;}
 
     public boolean promote() {
         Rank[] ranks = Rank.values();
