@@ -1,3 +1,6 @@
+/**
+ * The {@code Rank} enum represents different ranks of Jedi.
+ */
 public enum Rank {
     YOUNGLING,
     INITIATE,

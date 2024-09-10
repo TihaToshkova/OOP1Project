@@ -2,11 +2,26 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+/**
+ * The {@code OpenFile} class implements {@code OpenFileInterface} to open and process a file containing planet and Jedi data.
+ * It reads the contents of the file, initializes planets and jedis accordingly in {@code FileOperations}, and handles file-related exceptions.
+ */
 public class OpenFile implements OpenFileInterface {
     AddPlanet addPlanet = new AddPlanet();
     CreateJedi createJedi = new CreateJedi();
 
-    public void open(FileOperations fileOperations,Scanner scanner) {
+    /**
+     * Opens the specified file, reads its contents, and initializes planets and jedis in {@code FileOperations}.
+     * <p>
+     * If the file does not exist, it creates a new file with empty content. If the file exists, it reads each line,
+     * identifies whether it describes a planet or a Jedi, and adds them to the appropriate data structures in {@code FileOperations}.
+     * </p>
+     *
+     * @param fileOperations the {@code FileOperations} object to manage planets and jedis
+     * @param scanner        the {@code Scanner} object to read user input
+     * @throws NullPointerException if {@code fileOperations} or {@code scanner} is null
+     */
+    public void execute(FileOperations fileOperations, Scanner scanner) {
         System.out.print("Enter file name to open: ");
         String fileName = scanner.nextLine().trim();
 
@@ -26,7 +41,7 @@ public class OpenFile implements OpenFileInterface {
                 String line = fileScanner.nextLine();
                 if (line.startsWith("Planet ")) {
                     String planetName = line.substring(7).trim();
-                    addPlanet.addPlanet(fileOperations, planetName);
+                    addPlanet.execute(fileOperations, planetName);
                 } else if (line.startsWith("Jedi ")) {
                     String[] parts = line.substring(5).trim().split(" ");
                     if (parts.length == 6) {
@@ -37,7 +52,7 @@ public class OpenFile implements OpenFileInterface {
                         int jediStrength = Integer.parseInt(parts[4]);
                         String planetName = parts[5];
 
-                        createJedi.createJedi(fileOperations, planetName, jediName, jediRank, jediAge, saberColor, jediStrength);
+                        createJedi.execute(fileOperations, planetName, jediName, jediRank, jediAge, saberColor, jediStrength);
                     }
                 }
             }

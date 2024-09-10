@@ -1,7 +1,18 @@
 import java.util.Map;
 
-public class PrintJedi implements PrintInterface{
-    public void print(FileOperations fileOperations,String jediName) {
+/**
+ * The {@code PrintJedi} class implements {@code PrintInterface} to print details of a Jedi and the planet they belong to.
+ */
+public class PrintJedi implements PrintInterface {
+
+    /**
+     * Prints details of a Jedi and the planet they belong to based on the Jedi's name.
+     *
+     * @param fileOperations the {@code FileOperations} object containing the planets and jedis data
+     * @param jediName       the name of the Jedi to print details for
+     */
+    @Override
+    public void execute(FileOperations fileOperations, String jediName) {
         for (Map.Entry<String, Planet> entry : fileOperations.getPlanets().entrySet()) {
             Planet planet = entry.getValue();
             for (Jedi jedi : planet.getPopulation()) {

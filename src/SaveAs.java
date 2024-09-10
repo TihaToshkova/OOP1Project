@@ -1,8 +1,19 @@
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class SaveAs implements SaveAsInterface{
-    public void saveAs(FileOperations fileOperations,String newFileName) {
+/**
+ * The {@code SaveAs} class implements {@code SaveAsInterface} to save the current state of planets and jedis to a new file.
+ */
+public class SaveAs implements SaveAsInterface {
+
+    /**
+     * Saves the current state of planets and jedis to a new file specified by {@code newFileName}.
+     *
+     * @param fileOperations the {@code FileOperations} object containing the planets and jedis data to save
+     * @param newFileName    the name of the new file to save as
+     */
+    @Override
+    public void execute(FileOperations fileOperations, String newFileName) {
         if (fileOperations.getFileName() == null) {
             System.out.println("Error: No file is currently open.");
             return;

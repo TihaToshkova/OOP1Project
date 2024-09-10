@@ -1,6 +1,19 @@
-public class Help implements HelpInterface{
+/**
+ * The {@code Help} class provides a method to print out a list of supported commands and their descriptions.
+ * <p>
+ * This class implements the {@code HelpInterface} interface.
+ * </p>
+ */
+public class Help implements HelpInterface {
 
-    public void help() {
+    /**
+     * Prints the list of supported commands and their descriptions to the console.
+     * <p>
+     * This method outputs information about each supported command, including how to use it and a brief
+     * description of its functionality.
+     * </p>
+     */
+    public void execute() {
         System.out.println("The following commands are supported:");
         System.out.println("open <file>       - opens <file>");
         System.out.println("close             - closes currently opened file");

@@ -1,7 +1,27 @@
 import java.util.List;
 
+/**
+ * The {@code GetStrongestJedi} class provides a method to find the strongest Jedi on a specified planet
+ * managed by {@code FileOperations}.
+ * <p>
+ * This class implements the {@code GetStrongestJediInterface} interface.
+ * </p>
+ */
 public class GetStrongestJedi implements GetStrongestJediInterface{
-    public void getStrongestJedi(FileOperations fileOperations,String planetName) {
+
+    /**
+     * Finds and prints the strongest Jedi on a given planet.
+     * <p>
+     * This method searches for the Jedi with the highest strength on the specified planet. If the planet
+     * is not found, or if there are no jedis on the planet, it prints an appropriate error message. Otherwise,
+     * it prints the name and strength of the strongest Jedi.
+     * </p>
+     *
+     * @param fileOperations the {@code FileOperations} object that manages the collection of planets
+     * @param planetName     the name of the planet to search
+     * @throws NullPointerException if {@code fileOperations} or {@code planetName} is null
+     */
+    public void execute(FileOperations fileOperations,String planetName) {
         Planet planet = fileOperations.getPlanets().get(planetName);
 
         if (planet == null) {
@@ -24,6 +44,5 @@ public class GetStrongestJedi implements GetStrongestJediInterface{
 
         System.out.println("The strongest Jedi on planet " + planetName + " is " +
                 strongestJedi.getJediName() + " with strength " + strongestJedi.getStrength() + ".");
-
     }
 }

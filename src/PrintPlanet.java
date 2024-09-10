@@ -1,7 +1,18 @@
 import java.util.Comparator;
 
-public class PrintPlanet implements PrintInterface{
-    public void print(FileOperations fileOperations, String planetName) {
+/**
+ * The {@code PrintPlanet} class implements {@code PrintInterface} to print details of jedis inhabiting a specific planet.
+ */
+public class PrintPlanet implements PrintInterface {
+
+    /**
+     * Prints details of jedis inhabiting a specific planet, sorted by rank and then by Jedi name.
+     *
+     * @param fileOperations the {@code FileOperations} object containing the planets and jedis data
+     * @param planetName     the name of the planet to print details for
+     */
+    @Override
+    public void execute(FileOperations fileOperations, String planetName) {
         Planet planet = fileOperations.getPlanets().get(planetName);
         if (planet != null) {
             System.out.println("Planet: " + planet.getName());
